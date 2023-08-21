@@ -827,6 +827,7 @@ Now please respond to my question: {user_question}"""
       for context in contexts:
         # print({k: v for k, v in context.metadata.items() if k != 'embedding'})
         upload_metadata = {"metadata":context.metadata, "page_content":context.page_content}
+        print('vectors before = ', vectors)
         vectors.append(
             PointStruct(
                 id=str(uuid.uuid4()),
