@@ -31,7 +31,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Qdrant
 from pydub import AudioSegment
 from qdrant_client import QdrantClient, models
-from qdrant_client.models import PointStruct
+from qdrant_client.models import PointStruct, Distance, VectorParams
 
 from ai_ta_backend.aws import upload_data_files_to_s3
 from ai_ta_backend.extreme_context_stuffing import OpenAIAPIProcessor
@@ -813,6 +813,13 @@ Now please respond to my question: {user_question}"""
       print('after openAI')
       # parse results into dict of shape page_content -> embedding
       embeddings_dict: dict[str, List[float]] = {item[0]['input']: item[1]['data'][0]['embedding'] for item in oai.results}
+      try:
+          self.qdrant_client.create_collection(
+          collection_name=os.getenv('QDRANT_COLLECTION_NAME'),
+          vectors_config=VectorParams(size=100, distance=Distance.COSINE),
+      )
+      except:
+        pass
 
       ### BULK upload to Qdrant ###
       vectors: list[PointStruct] = []
