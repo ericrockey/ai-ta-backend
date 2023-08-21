@@ -810,6 +810,7 @@ Now please respond to my question: {user_question}"""
                                logging_level=logging.INFO,
                                token_encoding_name='cl100k_base')  # type: ignore
       asyncio.run(oai.process_api_requests_from_file())
+      print('oai.results = ', oai.results)
 
       # parse results into dict of shape page_content -> embedding
       embeddings_dict: dict[str, List[float]] = {item[0]['input']: item[1]['data'][0]['embedding'] for item in oai.results}
