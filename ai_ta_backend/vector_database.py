@@ -836,11 +836,11 @@ Now please respond to my question: {user_question}"""
             ))
       print('before QDrant upsert')
       print('vectors = ', vectors)
-      self.qdrant_client.upsert(
+      res = self.qdrant_client.upsert(
           collection_name=os.getenv('QDRANT_COLLECTION_NAME'),  # type: ignore
           points=vectors  # type: ignore
       )
-      print('after QDrant upsert')
+      print('after QDrant upsert, res = ', res)
       # # replace with Qdrant
       # self.vectorstore.add_texts([doc.page_content for doc in documents], [doc.metadata for doc in documents])
 
