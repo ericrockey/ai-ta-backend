@@ -800,7 +800,7 @@ Now please respond to my question: {user_question}"""
       contexts = remove_small_contexts(contexts=contexts)
 
       input_texts = [{'input': context.page_content, 'model': 'text-embedding-ada-002'} for context in contexts]
-
+      print('before OpenAI call')
       oai = OpenAIAPIProcessor(input_prompts_list=input_texts,
                                request_url='https://api.openai.com/v1/embeddings',
                                api_key=os.getenv('OPENAI_API_KEY'),
@@ -810,6 +810,7 @@ Now please respond to my question: {user_question}"""
                                logging_level=logging.INFO,
                                token_encoding_name='cl100k_base')  # type: ignore
       asyncio.run(oai.process_api_requests_from_file())
+      print('after openAI')
       # parse results into dict of shape page_content -> embedding
       embeddings_dict: dict[str, List[float]] = {item[0]['input']: item[1]['data'][0]['embedding'] for item in oai.results}
 
@@ -824,11 +825,12 @@ Now please respond to my question: {user_question}"""
                 vector=embeddings_dict[context.page_content],
                 payload= upload_metadata
             ))
-
+      print('before QDrant upsert')
       self.qdrant_client.upsert(
           collection_name=os.getenv('QDRANT_COLLECTION_NAME'),  # type: ignore
           points=vectors  # type: ignore
       )
+      print('after QDrant upsert')
       # # replace with Qdrant
       # self.vectorstore.add_texts([doc.page_content for doc in documents], [doc.metadata for doc in documents])
 
@@ -848,8 +850,8 @@ Now please respond to my question: {user_question}"""
           "base_url": contexts[0].metadata.get('base_url'),
           "contexts": contexts_for_supa,
       }
-
-      count = self.supabase_client.table(os.getenv('NEW_NEW_NEWNEW_MATERIALS_SUPABASE_TABLE')).insert(document).execute()  # type: ignore
+      print('before supabase NEW_NEW')
+      count = self.supabase_client.table(os.getenv('MATERIALS_SUPABASE_TABLE')).insert(document).execute()  # type: ignore
       print("successful END OF split_and_upload")
       return "Success"
     except Exception as e:
@@ -894,7 +896,7 @@ Now please respond to my question: {user_question}"""
     
     try:
       # Delete from Supabase
-      response = self.supabase_client.from_(os.getenv('NEW_NEW_NEWNEW_MATERIALS_SUPABASE_TABLE')).delete().eq('course_name', course_name).execute()
+      response = self.supabase_client.from_(os.getenv('MATERIALS_SUPABASE_TABLE')).delete().eq('course_name', course_name).execute()
       print("supabase response: ", response)
       return "Success"
     except Exception as e:
@@ -926,7 +928,7 @@ Now please respond to my question: {user_question}"""
       )
 
       # Delete from Supabase
-      response = self.supabase_client.from_(os.getenv('NEW_NEW_NEWNEW_MATERIALS_SUPABASE_TABLE')).delete().eq('s3_path', s3_path).eq(
+      response = self.supabase_client.from_(os.getenv('MATERIALS_SUPABASE_TABLE')).delete().eq('s3_path', s3_path).eq(
           'course_name', course_name).execute()
       return "Success"
     except Exception as e:
@@ -946,7 +948,7 @@ Now please respond to my question: {user_question}"""
     """
 
     response = self.supabase_client.table(
-        os.getenv('NEW_NEW_NEWNEW_MATERIALS_SUPABASE_TABLE')).select('course_name, s3_path, readable_filename, url, base_url').eq(  # type: ignore
+        os.getenv('MATERIALS_SUPABASE_TABLE')).select('course_name, s3_path, readable_filename, url, base_url').eq(  # type: ignore
             'course_name', course_name).execute()
 
     data = response.data
