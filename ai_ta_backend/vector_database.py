@@ -813,13 +813,13 @@ Now please respond to my question: {user_question}"""
 
       # parse results into dict of shape page_content -> embedding
       embeddings_dict: dict[str, List[float]] = {item[0]['input']: item[1]['data'][0]['embedding'] for item in oai.results}
-      try:
-          self.qdrant_client.create_collection(
-          collection_name=os.getenv('QDRANT_COLLECTION_NAME'),
-          vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
-      )
-      except:
-        pass
+      # try:
+      #     self.qdrant_client.create_collection(
+      #     collection_name=os.getenv('QDRANT_COLLECTION_NAME'),
+      #     vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
+      # )
+      # except:
+      #   pass
 
       ### BULK upload to Qdrant ###
       vectors: list[PointStruct] = []
