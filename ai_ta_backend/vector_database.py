@@ -833,6 +833,7 @@ Now please respond to my question: {user_question}"""
                 payload= upload_metadata
             ))
       print('before QDrant upsert')
+      print('vectors = ', vectors)
       self.qdrant_client.upsert(
           collection_name=os.getenv('QDRANT_COLLECTION_NAME'),  # type: ignore
           points=vectors  # type: ignore
