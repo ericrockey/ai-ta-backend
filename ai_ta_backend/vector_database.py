@@ -800,7 +800,7 @@ Now please respond to my question: {user_question}"""
       contexts = remove_small_contexts(contexts=contexts)
 
       input_texts = [{'input': context.page_content, 'model': 'text-embedding-ada-002'} for context in contexts]
-      print('before OpenAI call')
+
       oai = OpenAIAPIProcessor(input_prompts_list=input_texts,
                                request_url='https://api.openai.com/v1/embeddings',
                                api_key=os.getenv('OPENAI_API_KEY'),
@@ -810,16 +810,16 @@ Now please respond to my question: {user_question}"""
                                logging_level=logging.INFO,
                                token_encoding_name='cl100k_base')  # type: ignore
       asyncio.run(oai.process_api_requests_from_file())
-      print('after openAI')
+
       # parse results into dict of shape page_content -> embedding
       embeddings_dict: dict[str, List[float]] = {item[0]['input']: item[1]['data'][0]['embedding'] for item in oai.results}
-      try:
-          self.qdrant_client.create_collection(
-          collection_name=os.getenv('QDRANT_COLLECTION_NAME'),
-          vectors_config=VectorParams(size=100, distance=Distance.COSINE),
-      )
-      except:
-        pass
+      # try:
+      #     self.qdrant_client.create_collection(
+      #     collection_name=os.getenv('QDRANT_COLLECTION_NAME'),
+      #     vectors_config=VectorParams(size=100, distance=Distance.COSINE),
+      # )
+      # except:
+      #   pass
 
       ### BULK upload to Qdrant ###
       vectors: list[PointStruct] = []
